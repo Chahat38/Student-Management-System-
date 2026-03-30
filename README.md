@@ -65,14 +65,6 @@ project-folder/
 
 ---
 
-## ⚠️ Note
-
-* This project uses **temporary storage (arrays)**.
-* Data will be lost after page refresh.
-* For real-world applications, use a **database (MySQL, Firebase, etc.)**.
-
----
-
 ## 📌 Future Improvements
 
 * 💾 Add Local Storage / Database
@@ -84,7 +76,7 @@ project-folder/
 
 ## 👨‍💻 Author
 
-Developed by **[Your Name]**
+Developed by **[Chahat]**
 
 ---
 
