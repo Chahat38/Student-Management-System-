@@ -1,0 +1,257 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Manager</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+ <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+ <body>
+
+    <div class="main-header">
+       <h1>🎓 Student Management System</h1>
+    </div>
+ 
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="box">
+    <h2>🔐 Login</h2>
+ 
+    <!-- CHANGE 1: Message box instead of alert() -->
+    <div class="msg" id="loginMsg"></div>
+ 
+    <label for="loginEmail"></label>
+    <input type="email" id="loginEmail" placeholder="📧 Email"><br>
+ 
+    <label for="loginPass"></label>
+    <input type="password" id="loginPass" placeholder="🔑 Password"><br>
+ 
+    <button onclick="login()">Login →</button>
+ 
+    <p style="margin-top:14px; font-size:0.85rem;">
+        Don't have an account? <a href="#" onclick="showSignup()">Signup</a>
+    </p>
+</div>
+ 
+<!-- SIGNUP PAGE -->
+<div id="signupPage" class="box" style="display:none;">
+    <h2>📝 Signup</h2>
+ 
+    <!-- CHANGE 1: Message box instead of alert() -->
+    <div class="msg" id="signupMsg"></div>
+ 
+    <label for="signupName"></label>
+    <input type="text" id="signupName" placeholder="👤 Name"><br>
+ 
+    <label for="signupEmail"></label>
+    <input type="email" id="signupEmail" placeholder="📧 Email"><br>
+ 
+    <label for="signupPass"></label>
+    <input type="password" id="signupPass" placeholder="🔑 Password"><br>
+ 
+    <button onclick="signup()">Create Account →</button>
+ 
+    <p style="margin-top:14px; font-size:0.85rem;">
+        Already have an account? <a href="#" onclick="showLogin()">Login</a>
+    </p>
+</div>
+ 
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;">
+ 
+    <!-- Header -->
+    <div class="header">
+        <h2>🎓 Student Manager</h2>
+        <button onclick="logout()">🚪 Logout</button>
+    </div>
+ 
+    
+    <div class="dashboard-container">
+ 
+        <div class="form-box">
+            <h3>➕ Add Student</h3>
+ 
+            <div class="msg" id="studentMsg"></div>
+ 
+            <label for="name"></label>
+            <input type="text"   id="name"   placeholder="Student Name">
+
+            <label for="age"></label>
+            <input type="number" id="age"    placeholder="Age" minlength="4">
+
+            <label for="course"></label>
+            <input type="text"   id="course" placeholder="Course">
+
+            <button onclick="addStudent()">Add Student</button>
+
+        </div>
+ 
+        <div class="list-box">
+
+            <h3>
+                All Students
+                <span class="count-badge" id="countBadge">0</span>
+            </h3>
+            <div id="list">
+                <div class="empty-msg" id="emptyMsg">No students added yet.</div>
+            </div>
+        </div>
+ 
+    </div>
+</div>
+ 
+<script>
+
+let users = [];
+let students = [];
+ 
+ 
+function showMsg(id, text, type) {
+    let el = $("#" + id);
+    el.text(text);
+    el.removeClass("success error").addClass(type).show();
+ 
+    setTimeout(function() { el.hide(); }, 3000);
+}
+ 
+
+function showSignup() {
+    $("#loginPage").hide();
+    $("#signupPage").show();
+}
+ 
+function showLogin() {
+    $("#signupPage").hide();
+    $("#loginPage").show();
+}
+ 
+ 
+function signup() {
+     
+    let name  = $("#signupName").val().trim();
+    let email = $("#signupEmail").val().trim();
+    let pass  = $("#signupPass").val().trim();
+ 
+     
+    if (!name || !email || !pass) {
+        showMsg("signupMsg", "⚠️ Please fill in all fields.", "error");
+        return;
+    }
+ 
+     
+    let exists = users.find(u => u.email === email);
+    if (exists) {
+        showMsg("signupMsg", "⚠️ This email is already registered.", "error");
+        return;
+    }
+ 
+    
+    users.push({ name, email, password: pass });
+ 
+   
+    showMsg("signupMsg", "✅ Signup successful! Please login.", "success");
+ 
+     
+    $("#signupName, #signupEmail, #signupPass").val("");
+ 
+    setTimeout(showLogin, 1500);
+}
+ 
+ 
+function login() {
+    let email = $("#loginEmail").val().trim();
+    let pass  = $("#loginPass").val().trim();
+ 
+    
+    if (!email || !pass) {
+        showMsg("loginMsg", "⚠️ Please enter your email and password.", "error");
+        return;
+    }
+ 
+    let user = users.find(u => u.email === email && u.password === pass);
+ 
+    if (user) {
+        $("#loginPage").hide();
+        $("#dashboard").show();
+        $("#loginEmail, #loginPass").val("");
+    } else {
+      
+        showMsg("loginMsg", "❌ Wrong email or password.", "error");
+    }
+}
+ 
+ 
+function logout() {
+    $("#dashboard").hide();
+    $("#loginPage").show();
+}
+ 
+ 
+function addStudent() {
+    let name   = $("#name").val().trim();
+    let age    = $("#age").val().trim();
+    let course = $("#course").val().trim();
+ 
+     
+    if (!name || !age || !course) {
+        showMsg("studentMsg", "⚠️ Please fill in all student fields.", "error");
+        return;
+    }
+ 
+     
+    if (age < 10 || age > 100) {
+        showMsg("studentMsg", "⚠️ Please enter a valid age.", "error");
+        return;
+    }
+ 
+    students.push({ name, age, course });
+ 
+    showMsg("studentMsg", "✅ Student added successfully!", "success");
+ 
+    displayStudents();
+ 
+     
+    $("#name, #age, #course").val("");
+}
+ 
+ 
+function displayStudents() {
+    $("#list").html("");
+ 
+     
+    $("#countBadge").text(students.length);
+ 
+     
+    if (students.length === 0) {
+        $("#list").append('<div class="empty-msg">No students added yet.</div>');
+        return;
+    }
+ 
+    students.forEach(function(s, index) {
+      
+        $("#list").append(`
+            <div class="student">
+                <div class="student-info">
+                    <strong>${s.name}</strong><br>
+                    <span>Age: ${s.age} &nbsp;|&nbsp; Course: ${s.course}</span>
+                </div>
+                <button onclick="deleteStudent(${index})">🗑 Delete</button>
+            </div>
+        `);
+    });
+}
+ 
+ 
+function deleteStudent(index) {
+    students.splice(index, 1);
+    displayStudents();
+    showMsg("studentMsg", "🗑 Student removed.", "error");
+}
+</script>
+ 
+</body>
+</html>
